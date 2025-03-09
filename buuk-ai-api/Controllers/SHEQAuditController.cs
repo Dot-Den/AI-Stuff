@@ -27,8 +27,8 @@ namespace AIReportingAPI.Controllers
         public async Task<IActionResult> ProcessFile()
         {
             // Fetch SharePoint data
-            var siteId = "YOUR_SITE_ID";
-            var listId = "YOUR_LIST_ID";
+            var siteId = "buuk.sharepoint.com,sheq,SHEQAUDIT"; // Replace with actual site ID
+            var listId = "Safety Inspection Form Archive"; // Replace with actual list ID
             var listItems = await _sharePointService.GetSharePointListItemsAsync(siteId, listId);
 
             // Prepare data for AI processing

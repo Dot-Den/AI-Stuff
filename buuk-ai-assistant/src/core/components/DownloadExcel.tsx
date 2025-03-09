@@ -6,11 +6,11 @@ import { Button } from 'primereact/button';
 const DownloadExcel = () => {
   const downloadFile = async () => {
     try {
-      const response = await axios.get('YOUR_API_ENDPOINT', {
+      const response = await axios.post('https://localhost:5001/api/sheqaudit/process', {}, {
         responseType: 'blob',
       });
       const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      saveAs(blob, 'file.xlsx');
+      saveAs(blob, 'report.xlsx');
     } catch (error) {
       console.error('Error downloading the file', error);
     }
