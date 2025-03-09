@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { saveAs } from 'file-saver';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { Button } from 'primereact/button';
 
 const data = [
   { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
@@ -12,6 +15,23 @@ const data = [
 ];
 
 const SHEQAuditView = () => {
+  const [loading, setLoading] = useState(false);
+
+  const downloadFile = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post('https://localhost:5001/api/sheqaudit/process', {}, {
+        responseType: 'blob',
+      });
+      const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, 'report.xlsx');
+    } catch (error) {
+      console.error('Error downloading the file', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <h1>SHEQ Audit View</h1>
@@ -31,6 +51,13 @@ const SHEQAuditView = () => {
         <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
         <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
       </LineChart>
+      <Button
+        label="Download Excel"
+        icon="pi pi-download"
+        onClick={downloadFile}
+        loading={loading}
+        className="p-button-primary mt-4"
+      />
     </div>
   );
 };
