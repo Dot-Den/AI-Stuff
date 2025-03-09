@@ -26,7 +26,7 @@ namespace AIReportingAPI.Services
             _graphClient = new GraphServiceClient(authProvider);
         }
 
-        public async Task<IListItemsCollectionPage> GetSharePointListItemsAsync(string siteId, string listId)
+        public async Task<IListItemCollectionPage> GetSharePointListItemsAsync(string siteId, string listId)
         {
             return await _graphClient.Sites[siteId].Lists[listId].Items.Request().GetAsync();
         }
