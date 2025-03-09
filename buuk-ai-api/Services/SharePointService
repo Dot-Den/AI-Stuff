@@ -3,42 +3,45 @@ using Microsoft.Identity.Client;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-public class SharePointService
+namespace AIReportingAPI.Services
 {
-    private readonly GraphServiceClient _graphClient;
-
-    public SharePointService(string clientId, string tenantId, string clientSecret)
+    public class SharePointService
     {
-        var confidentialClient = ConfidentialClientApplicationBuilder
-            .Create(clientId)
-            .WithTenantId(tenantId)
-            .WithClientSecret(clientSecret)
-            .Build();
+        private readonly GraphServiceClient _graphClient;
 
-        var authProvider = new DelegateAuthenticationProvider(async (requestMessage) =>
+        public SharePointService(string clientId, string tenantId, string clientSecret)
         {
-            var authResult = await confidentialClient.AcquireTokenForClient(new[] { "https://graph.microsoft.com/.default" }).ExecuteAsync();
-            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
-        });
+            var confidentialClient = ConfidentialClientApplicationBuilder
+                .Create(clientId)
+                .WithTenantId(tenantId)
+                .WithClientSecret(clientSecret)
+                .Build();
 
-        _graphClient = new GraphServiceClient(authProvider);
-    }
+            var authProvider = new DelegateAuthenticationProvider(async (requestMessage) =>
+            {
+                var authResult = await confidentialClient.AcquireTokenForClient(new[] { "https://graph.microsoft.com/.default" }).ExecuteAsync();
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
+            });
 
-    public async Task<IListItemsCollectionPage> GetSharePointListItemsAsync(string siteId, string listId)
-    {
-        return await _graphClient.Sites[siteId].Lists[listId].Items.Request().GetAsync();
-    }
+            _graphClient = new GraphServiceClient(authProvider);
+        }
 
-    // Test method to fetch SharePoint data
-    public async Task TestSharePointCallAsync()
-    {
-        var siteId = "buuk.sharepoint.com,sheq,SHEQAUDIT"; // Replace with actual site ID
-        var listId = "Safety Inspection Form Archive"; // Replace with actual list ID
-        var listItems = await GetSharePointListItemsAsync(siteId, listId);
-
-        foreach (var item in listItems)
+        public async Task<IListItemsCollectionPage> GetSharePointListItemsAsync(string siteId, string listId)
         {
-            Console.WriteLine(item.Fields.AdditionalData["Title"]);
+            return await _graphClient.Sites[siteId].Lists[listId].Items.Request().GetAsync();
+        }
+
+        // Test method to fetch SharePoint data
+        public async Task TestSharePointCallAsync()
+        {
+            var siteId = "buuk.sharepoint.com,sheq,SHEQAUDIT"; // Replace with actual site ID
+            var listId = "Safety Inspection Form Archive"; // Replace with actual list ID
+            var listItems = await GetSharePointListItemsAsync(siteId, listId);
+
+            foreach (var item in listItems)
+            {
+                Console.WriteLine(item.Fields.AdditionalData["Title"]);
+            }
         }
     }
 }

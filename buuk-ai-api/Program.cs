@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using AIReportingAPI.Services; 
 
 public class Startup
 {
@@ -22,7 +23,7 @@ public class Startup
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "AI Reporting API", Version = "v1" });
         });
         services.AddHttpClient();
-        services.AddSingleton(new SharePointService(
+        services.AddSingleton<SharePointService>(provider => new SharePointService(
             Configuration["AzureAd:ClientId"],
             Configuration["AzureAd:TenantId"],
             Configuration["AzureAd:ClientSecret"]

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using AIReportingAPI.Services;
 
 namespace AIReportingAPI.Controllers
 {
