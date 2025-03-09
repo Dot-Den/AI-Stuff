@@ -28,4 +28,17 @@ public class SharePointService
     {
         return await _graphClient.Sites[siteId].Lists[listId].Items.Request().GetAsync();
     }
+
+    // Test method to fetch SharePoint data
+    public async Task TestSharePointCallAsync()
+    {
+        var siteId = "buuk.sharepoint.com,sheq,SHEQAUDIT"; // Replace with actual site ID
+        var listId = "Safety Inspection Form Archive"; // Replace with actual list ID
+        var listItems = await GetSharePointListItemsAsync(siteId, listId);
+
+        foreach (var item in listItems)
+        {
+            Console.WriteLine(item.Fields.AdditionalData["Title"]);
+        }
+    }
 }
