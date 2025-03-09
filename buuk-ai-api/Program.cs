@@ -23,11 +23,6 @@ public class Startup
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "AI Reporting API", Version = "v1" });
         });
         services.AddHttpClient();
-        services.AddSingleton<SharePointService>(provider => new SharePointService(
-            Configuration["AzureAd:ClientId"],
-            Configuration["AzureAd:TenantId"],
-            Configuration["AzureAd:ClientSecret"]
-        ));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

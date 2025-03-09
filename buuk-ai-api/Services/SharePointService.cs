@@ -1,47 +1,50 @@
-using Microsoft.Graph;
-using Microsoft.Identity.Client;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
+using System.Net;
+using System.Net.Http;
+using AIReportingAPI.Models.SharePointData;
 
 namespace AIReportingAPI.Services
 {
     public class SharePointService
     {
-        private readonly GraphServiceClient _graphClient;
+    public async Task<List<SharePointList>> GetSHEQAuditSharePointList()
+    {
+        using var client = httpClientFactory.CreateClient(SharePointApiAppSettings.SharePointApiHttpClientName);
 
-        public SharePointService(string clientId, string tenantId, string clientSecret)
+        var url = "http://bukwlptstv05:50049/api/Lists/SHEQ%20Audit";
+
+        var log = new ClientResponseLog("SharePoint Lists for SHEQ Audit");
+        log.Url = url;
+
+        try
         {
-            var confidentialClient = ConfidentialClientApplicationBuilder
-                .Create(clientId)
-                .WithTenantId(tenantId)
-                .WithClientSecret(clientSecret)
-                .Build();
+            var httpResponse = await client.GetAsync(url);
 
-            var authProvider = new DelegateAuthenticationProvider(async (requestMessage) =>
-            {
-                var authResult = await confidentialClient.AcquireTokenForClient(new[] { "https://graph.microsoft.com/.default" }).ExecuteAsync();
-                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
-            });
+            log.StatusCode = httpResponse.StatusCode.ToString();
+            log.ReasonPhrase = httpResponse.ReasonPhrase ?? "[unknown]";
+            if (httpResponse.StatusCode != HttpStatusCode.OK)
+                throw new Exception($"Failed to load lists from {request.SiteName} ({httpResponse.ReasonPhrase ?? httpResponse.StatusCode.ToString()}).", new { url });
 
-            _graphClient = new GraphServiceClient(authProvider);
+            var stringResponse = await httpResponse.Content.ReadAsStringAsync();
+            if (stringResponse == "")
+                throw new Exception("SharePoint lists API returned empty result.", new { url });
+
+            var lists = JsonSerializer.Deserialize<List<SharePointList>>(stringResponse)!;
+            return lists;
         }
-
-        // Test method to fetch SharePoint data
-        public async Task TestSharePointCallAsync()
+        catch
         {
-            var siteId = "buuk.sharepoint.com,sheq,SHEQAUDIT"; // Replace with actual site ID
-            var listId = "Safety Inspection Form Archive"; // Replace with actual list ID
-            
-            var items = await _graphClient.Sites["{site-id}"]
-                .Lists["{list-id}"]
-                .Items
-                .Request()
-                .GetAsync();
-
-            foreach (var item in listItems)
-            {
-                Console.WriteLine(item.Fields.AdditionalData["Title"]);
-            }
+            clientResponseLogger.LogResponse(log);
+            log = null;
+            throw;
         }
+        finally
+        {
+            // Doesn't log all requests as, if configured correctly will be OK with results or empty results
+            //if (log != null)
+            //{
+            //    clientResponseLogger.LogResponse(log);
+            //}
+        }
+    }
     }
 }
