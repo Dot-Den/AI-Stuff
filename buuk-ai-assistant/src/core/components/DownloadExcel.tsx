@@ -1,4 +1,3 @@
-import React from 'react';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 import { Button } from 'primereact/button';

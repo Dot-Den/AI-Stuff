@@ -3,6 +3,9 @@ import axios from 'axios';
 import { saveAs } from 'file-saver';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Button } from 'primereact/button';
+import { FileUpload, FileUploadHandlerEvent } from 'primereact/fileupload';
+import { Card } from 'primereact/card';
+import { Message } from 'primereact/message';
 
 const data = [
   { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
@@ -16,17 +19,35 @@ const data = [
 
 const SHEQAuditView = () => {
   const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState<string | null>(null);
 
-  const downloadFile = async () => {
+  // Handle the file upload
+  const handleUpload = async (event: FileUploadHandlerEvent) => {
+    const file = event.files[0];
+    if (!file) {
+      setResponse('Please select a file.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await axios.post('https://localhost:5001/api/sheqaudit/process', {}, {
-        responseType: 'blob',
+      const formData = new FormData();
+      formData.append('csv', file);
+
+      // Send the CSV file to OpenWebUI API
+      const openwebuiResponse = await axios.post('http://localhost:3000/api/model/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        responseType: 'blob',  // to handle file responses
       });
-      const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      saveAs(blob, 'report.xlsx');
+
+      // Process the returned file (for example, a CSV file)
+      const blob = new Blob([openwebuiResponse.data], { type: 'text/csv' });
+      saveAs(blob, 'processed_report.csv');
+      
+      setResponse('File processed successfully!');
     } catch (error) {
-      console.error('Error downloading the file', error);
+      console.error('Error uploading file:', error);
+      setResponse('Error processing the file.');
     } finally {
       setLoading(false);
     }
@@ -34,7 +55,6 @@ const SHEQAuditView = () => {
 
   return (
     <div>
-      <h1>SHEQ Audit View</h1>
       <LineChart
         width={500}
         height={300}
@@ -51,13 +71,34 @@ const SHEQAuditView = () => {
         <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
         <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
       </LineChart>
-      <Button
-        label="Download Excel"
-        icon="pi pi-download"
-        onClick={downloadFile}
-        loading={loading}
-        className="p-button-primary mt-4"
-      />
+
+      <Card title="Upload CSV for AI Processing">
+        <FileUpload
+          mode="basic"
+          name="csv"
+          accept=".csv"
+          customUpload
+          uploadHandler={handleUpload}
+          chooseLabel="Select CSV"
+          className="p-mb-3"
+        />
+        <Button
+          label="Upload & Process"
+          icon="pi pi-upload"
+          loading={loading}
+          className="p-button-success p-mt-2"
+          onClick={() => {
+            const fileInput = document.querySelector("input[type=file]") as HTMLInputElement;
+            if (fileInput?.files?.[0]) {
+              handleUpload({ files: [fileInput.files[0]] } as FileUploadHandlerEvent);
+            }
+          }}
+        />
+
+        {response && (
+          <Message severity="info" text={response} className="p-mt-3" />
+        )}
+      </Card>
     </div>
   );
 };

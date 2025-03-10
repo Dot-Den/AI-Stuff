@@ -8,18 +8,19 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import Navbar from "./core/components/Navbar";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+// import Navbar from "./core/components/Navbar";
 import SHEQAuditView from "./pages/SHEQAudit/containers/SHEQAuditView"; // Import the SHEQAuditView component
+import TestModelCallView from "./pages/TestModelCall/TestModelCallView"
 
 const Main = () => {
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="pt-20 h-screen overflow-hidden"> {/* Add padding to the top and set height to full */}
         <Routes>
           <Route path="/" element={<App />}>
-            <Route path="/" element={<Navigate to="/landing" />} />
+            <Route path="/" element={<TestModelCallView/>} />
             <Route path="/sheqaudit" element={<SHEQAuditView />} /> {/* Add the route for SHEQAuditView */}
           </Route>
         </Routes>
