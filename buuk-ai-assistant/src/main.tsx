@@ -12,6 +12,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 // import Navbar from "./core/components/Navbar";
 import SHEQAuditView from "./pages/SHEQAudit/containers/SHEQAuditView.tsx"; // Import the SHEQAuditView component
 import TestModelCallView from "./pages/TestModelCall/TestModelCallView"
+import SHEQAuditReportingView from "./pages/SHEQAudit/containers/SHEQAuditReportingView.tsx"
 
 const Main = () => {
   return (
@@ -21,6 +22,7 @@ const Main = () => {
         <Routes>
           <Route path="/" element={<App />}>
             <Route path="/" element={<TestModelCallView/>} />
+            <Route path="/sheqauditreports" element={<SHEQAuditReportingView/>}/>
             <Route path="/sheqaudit" element={<SHEQAuditView />} /> {/* Add the route for SHEQAuditView */}
           </Route>
         </Routes>
