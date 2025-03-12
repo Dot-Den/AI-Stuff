@@ -18,8 +18,8 @@ const TestModelCallView = () => {
       setError(null);
       setResponse(null);
   
-      const apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ5NTUyZGQzLTllY2QtNGRiYy1hNGExLTg1ZDVhYzJkZWE1YiJ9.RD5N9-fWhRIETQmbEBkRSh80f8-46q4KRwK8uKNlLnw'; // Use your actual API key or environment variable
-      const url = 'https://server01.hackathonservices.co.uk/api/chat/completions'; 
+      const apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ5OGIzNzA5LTc2YTQtNGE2YS04YzZmLTJhZGQwYTM0NjE1ZSJ9.7hh5ffKyB4ZB5tidroQlQgQAt_e2BOwYku23Zb3zkAM'; // Use your actual API key or environment variable
+      const url = 'https://server03.hackathonservices.co.uk/api/chat/completions'; 
   
       try {
         const res = await axios.post(

@@ -10,7 +10,7 @@ const queryClient = new QueryClient();
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 // import Navbar from "./core/components/Navbar";
-import SHEQAuditView from "./pages/SHEQAudit/containers/SHEQAuditView"; // Import the SHEQAuditView component
+import SHEQAuditView from "./pages/SHEQAudit/containers/SHEQAuditView.tsx"; // Import the SHEQAuditView component
 import TestModelCallView from "./pages/TestModelCall/TestModelCallView"
 
 const Main = () => {
