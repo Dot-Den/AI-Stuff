@@ -1,72 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import { BarChart, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Bar } from '@mui/x-charts';
+import React from 'react';
+import { BarChart } from '@mui/x-charts/BarChart';
+import { PieChart } from '@mui/x-charts/PieChart';
+import { dummyRootCauses, dummyVEChoices, dummyFindings } from '../../../data/dummyData';
 
-const MyCharts = () => {
-    const [mostCommonRisk, setMostCommonRisk] = useState(null);
-    const [posNegRatio, setPosNegRatio] = useState([]);
-    const [biggestRootIssue, setBiggestRootIssue] = useState(null);
+const SHEQAuditReportingView: React.FC = () => {
+  // Prepare data for RootCause Bar Chart
+  const rootCauseData = dummyRootCauses.map(rc => ({
+    id: rc.id,
+    value: dummyFindings.filter(finding => finding.rootCauseId === rc.id).length,
+    label: rc.rootCause,
+  }));
 
-    useEffect(() => {
-        // Fetch data from your backend
-        fetch('/api/data')
-            .then(response => response.json())
-            .then(data => {
-                setMostCommonRisk(data.mostCommonRisk);
-                setPosNegRatio(data.posNegRatio);
-                setBiggestRootIssue(data.biggestRootIssue);
-            })
-            .catch(error => console.error('Error fetching data:', error));
-    }, []);
+  // Prepare data for VEChoice PieChart
+  const veChoiceCounts = dummyVEChoices.reduce((acc, choice) => {
+    acc[choice.veChoice] = dummyFindings.filter(finding => finding.veChoiceId === choice.id).length;
+    return acc;
+  }, {} as Record<string, number>);
 
-    return (
-        <div>
-            {mostCommonRisk && (
-                <BarChart
-                    dataset={[
-                        {
-                            label: 'Most Common Risk',
-                            data: [mostCommonRisk.Count],
-                        },
-                    ]}
-                    xAxis={[{ scaleType: 'band', data: [mostCommonRisk.Risk] }]}
-                    series={[{ dataKey: 'data' }]}
-                    width={500}
-                    height={300}
-                />
-            )}
 
-            {posNegRatio.length > 0 && (
-                <PieChart>
-                    <Pie
-                        data={[
-                            posNegRatio.map(item => ({ id: item.VEChoice, value: item.Count })),
-                        ]}
-                        innerRadius="45%"
-                        outerRadius="60%"
-                    >
-                        {posNegRatio.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.VEChoice === 'Positive' ? '#8884d8' : '#ff6347'} />
-                        ))}
-                    </Pie>
-                </PieChart>
-            )}
+  return (
+    <div>
+      {/* Root Cause Bar Chart */}
+      <h2>Root Causes Distribution</h2>
+      <BarChart
+        xAxis={[{ scaleType: 'band', data: rootCauseData.map(data => data.label) }]}
+        series={[
+          { data: rootCauseData.map(data => data.value), label: 'Occurrences' },
+        ]}
+        width={600}
+        height={400}
+      />
 
-            {biggestRootIssue && (
-                <BarChart
-                    dataset={[
-                        {
-                            label: 'Biggest Root Issue',
-                            data: [biggestRootIssue.Count],
-                        },
-                    ]}
-                    xAxis={[{ scaleType: 'band', data: [biggestRootIssue.RootCause] }]}
-                    series={[{ dataKey: 'data' }]}
-                    width={500}
-                    height={300}
-                />
-            )}
-        </div>
-    );
+      {/* VEChoice Pie Chart */}
+      <h2>VE Choice Distribution</h2>
+      <PieChart
+        series={[
+            {
+                    data: [
+                    { id: 0, value: veChoiceCounts['Positive'], label: 'Positive' },
+                    { id: 1, value: veChoiceCounts['Reactive'], label: 'Reactive' },
+                    ],
+                },
+        ]}
+        width={350} height={300}
+      />
+    </div>
+  );
 };
 
-export default MyCharts;
+export default SHEQAuditReportingView;
